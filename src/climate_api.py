@@ -21,11 +21,15 @@ app = Flask(__name__,
             template_folder='../templates',
             static_folder='../static')
 
-# Load climate data
-df = pd.read_csv('data/climate_data.csv')
+# Get the base directory (project root)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(BASE_DIR, 'data')
+
+# Load climate data with absolute path
+df = pd.read_csv(os.path.join(DATA_DIR, 'climate_data.csv'))
 
 # --- 数据库配置 ---
-DATABASE_PATH = 'data/climate.db'
+DATABASE_PATH = os.path.join(DATA_DIR, 'climate.db')
 
 def get_db_connection():
     """创建数据库连接"""
@@ -36,7 +40,7 @@ def get_db_connection():
 def init_database():
     """初始化数据库表结构"""
     # Ensure data directory exists
-    os.makedirs('data', exist_ok=True)
+    os.makedirs(DATA_DIR, exist_ok=True)
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -63,7 +67,7 @@ init_database()
 
 def get_services():
     """Load and process services from CSV with better data structure"""
-    df = pd.read_csv('data/bayarea_services.csv')
+    df = pd.read_csv(os.path.join(DATA_DIR, 'bayarea_services.csv'))
     services = []
 
     for _, row in df.iterrows():
@@ -383,7 +387,7 @@ def add_climate_record():
         # Add record
         new_record = pd.DataFrame([{'Year': year, 'Avg_Temp': data['Avg_Temp']}])
         df = pd.concat([df, new_record], ignore_index=True)
-        df.to_csv('data/climate_data.csv', index=False)
+        df.to_csv(os.path.join(DATA_DIR, 'climate_data.csv'), index=False)
         
         return jsonify({'message': 'Record added', 'record': new_record.iloc[0].to_dict()}), 201
     
