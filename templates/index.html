@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>气候变化可视化</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #f0f2f5; }
+        .container { width: 80%; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-top: 50px; }
+        h1 { color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌍 全球平均气温趋势线</h1>
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <script>
+        // 从 Flask 获取数据
+        const dataFromFlask = {{ data | tojson }};
+        
+        // 解析数据用于图表
+        const labels = dataFromFlask.map(item => item.Year);
+        const temps = dataFromFlask.map(item => item.Avg_Temp);
+
+        // 初始化图表
+        const ctx = document.getElementById('myChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '平均气温 (°C)',
+                    data: temps,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderWidth: 3,
+                    tension: 0.3 // 让线条更平滑
+                }]
+            }
+        });
+    </script>
+</body>
+</html>
